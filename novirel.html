@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novirel — AI Broker Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Playfair+Display+SC:wght@400;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #09090f;
+  --s1:      #0f0f18;
+  --s2:      #141420;
+  --s3:      #1b1b28;
+  --border:  #252535;
+  --border2: #32324a;
+  --green:   #00e5a0;
+  --gdim:    rgba(0,229,160,0.07);
+  --gglow:   rgba(0,229,160,0.14);
+  --text:    #eeeef5;
+  --muted:   #55556a;
+  --muted2:  #8888a0;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+font-family: ‘Playfair Display’, serif;
+background: var(–bg);
+color: var(–text);
+min-height: 100vh;
+overflow-x: hidden;
+-webkit-font-smoothing: antialiased;
+}
+
+/* subtle grid */
+body::before {
+content:’’;
+position:fixed;
+inset:0;
+background-image:
+linear-gradient(rgba(0,229,160,0.025) 1px, transparent 1px),
+linear-gradient(90deg, rgba(0,229,160,0.025) 1px, transparent 1px);
+background-size: 44px 44px;
+pointer-events:none;
+z-index:0;
+}
+
+/* top glow */
+body::after {
+content:’’;
+position:fixed;
+top:-160px; left:50%;
+transform:translateX(-50%);
+width:700px; height:360px;
+background:radial-gradient(ellipse, rgba(0,229,160,0.05) 0%, transparent 70%);
+pointer-events:none;
+z-index:0;
+}
+
+.app {
+position:relative;
+z-index:1;
+max-width:960px;
+margin:0 auto;
+padding:0 22px 80px;
+}
+
+/* ── HEADER ── */
+.header {
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:28px 0 24px;
+border-bottom:1px solid var(–border);
+margin-bottom:36px;
+animation: rise 0.5s ease both;
+}
+
+.logo {
+font-family:‘Playfair Display’, serif;
+font-weight:700;
+font-size:26px;
+letter-spacing:1px;
+color:var(–text);
+}
+
+.logo em {
+font-style:italic;
+color:var(–green);
+}
+
+.badge {
+font-family:‘DM Mono’, monospace;
+font-size:10px;
+letter-spacing:1.5px;
+text-transform:uppercase;
+color:var(–green);
+background:var(–gdim);
+border:1px solid rgba(0,229,160,0.18);
+padding:5px 13px;
+border-radius:20px;
+display:flex;
+align-items:center;
+gap:7px;
+}
+
+.live-dot {
+width:6px; height:6px;
+background:var(–green);
+border-radius:50%;
+animation:pulse 1.8s infinite;
+}
+
+@keyframes pulse {
+0%,100%{ box-shadow:0 0 0 0 rgba(0,229,160,0.5); }
+50%{ box-shadow:0 0 0 5px rgba(0,229,160,0); }
+}
+
+/* ── HERO ── */
+.hero {
+padding:36px 0 32px;
+border-bottom:1px solid var(–border);
+margin-bottom:32px;
+animation:rise 0.5s ease 0.08s both;
+}
+
+.hero h1 {
+font-size:44px;
+font-weight:500;
+line-height:1.12;
+letter-spacing:-0.3px;
+margin-bottom:12px;
+}
+
+.hero h1 em {
+font-style:italic;
+color:var(–green);
+}
+
+.hero p {
+font-family:‘DM Mono’, monospace;
+font-size:12px;
+color:var(–muted2);
+max-width:440px;
+line-height:1.7;
+letter-spacing:0.3px;
+}
+
+.hero-stats {
+display:flex;
+gap:36px;
+margin-top:28px;
+}
+
+.hstat-val {
+font-size:30px;
+font-weight:600;
+color:var(–green);
+line-height:1;
+}
+
+.hstat-lbl {
+font-family:‘DM Mono’, monospace;
+font-size:9px;
+letter-spacing:1.5px;
+text-transform:uppercase;
+color:var(–muted);
+margin-top:4px;
+}
+
+/* ── TABS ── */
+.tabs {
+display:flex;
+background:var(–s1);
+border:1px solid var(–border);
+border-radius:10px;
+padding:4px;
+gap:3px;
+margin-bottom:24px;
+animation:rise 0.5s ease 0.14s both;
+}
+
+.tab {
+flex:1;
+padding:10px 6px;
+background:none;
+border:none;
+color:var(–muted2);
+font-family:‘Playfair Display’, serif;
+font-size:13px;
+font-weight:500;
+cursor:pointer;
+border-radius:7px;
+transition:all 0.2s;
+letter-spacing:0.2px;
+}
+
+.tab:hover:not(.active) { color:var(–text); }
+
+.tab.active {
+background:var(–s3);
+color:var(–green);
+border:1px solid var(–border2);
+box-shadow:0 2px 10px rgba(0,0,0,0.35);
+}
+
+/* ── PANELS ── */
+.panel { display:none; }
+.panel.active { display:block; animation:rise 0.28s ease both; }
+
+@keyframes rise {
+from { opacity:0; transform:translateY(10px); }
+to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── SECTION ── */
+.section-label {
+font-family:‘DM Mono’, monospace;
+font-size:10px;
+letter-spacing:2px;
+text-transform:uppercase;
+color:var(–muted);
+margin-bottom:6px;
+}
+
+.section-desc {
+font-size:14px;
+font-style:italic;
+color:var(–muted2);
+margin-bottom:22px;
+line-height:1.6;
+border-left:2px solid var(–border2);
+padding-left:14px;
+}
+
+/* ── CARD ── */
+.card {
+background:var(–s1);
+border:1px solid var(–border);
+border-radius:12px;
+padding:26px;
+margin-bottom:14px;
+}
+
+.card-header {
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:20px;
+}
+
+.card-title {
+font-size:16px;
+font-weight:600;
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.card-icon {
+width:30px; height:30px;
+border-radius:7px;
+background:var(–gdim);
+border:1px solid rgba(0,229,160,0.12);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:13px;
+}
+
+.tag {
+font-family:‘DM Mono’, monospace;
+font-size:9px;
+letter-spacing:1.2px;
+text-transform:uppercase;
+padding:4px 10px;
+border-radius:4px;
+}
+
+.tag-green { background:var(–gdim); color:var(–green); border:1px solid rgba(0,229,160,0.15); }
+.tag-amber { background:rgba(255,160,60,0.08); color:#ffa03c; border:1px solid rgba(255,160,60,0.15); }
+
+/* ── GRID / FIELDS ── */
+.grid { display:grid; gap:14px; }
+.grid-2 { grid-template-columns:1fr 1fr; }
+.grid-3 { grid-template-columns:1fr 1fr 1fr; }
+.full { grid-column:1/-1; }
+.field { display:flex; flex-direction:column; gap:5px; }
+
+label {
+font-family:‘DM Mono’, monospace;
+font-size:9px;
+letter-spacing:1.5px;
+text-transform:uppercase;
+color:var(–muted);
+font-weight:400;
+}
+
+input, select, textarea {
+background:var(–bg);
+border:1px solid var(–border);
+border-radius:7px;
+color:var(–text);
+font-family:‘Playfair Display’, serif;
+font-size:13.5px;
+padding:9px 12px;
+outline:none;
+transition:border-color 0.2s, background 0.2s;
+width:100%;
+-webkit-appearance:none;
+}
+
+input:focus, select:focus, textarea:focus {
+border-color:rgba(0,229,160,0.4);
+background:rgba(0,229,160,0.015);
+box-shadow:0 0 0 3px rgba(0,229,160,0.04);
+}
+
+input::placeholder { color:var(–muted); font-style:italic; }
+select option { background:#0f0f18; }
+textarea { resize:vertical; min-height:72px; line-height:1.6; }
+
+/* ── BUTTONS ── */
+.btn-run {
+width:100%;
+margin-top:8px;
+padding:14px;
+background:var(–green);
+color:#000;
+border:none;
+border-radius:8px;
+font-family:‘Playfair Display’, serif;
+font-size:15px;
+font-weight:600;
+letter-spacing:0.3px;
+cursor:pointer;
+transition:all 0.18s;
+box-shadow:0 4px 18px rgba(0,229,160,0.18);
+}
+
+.btn-run:hover:not(:disabled) {
+background:#18ffb8;
+transform:translateY(-1px);
+box-shadow:0 6px 22px rgba(0,229,160,0.28);
+}
+
+.btn-run:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+
+.btn-sm {
+font-family:‘DM Mono’, monospace;
+font-size:10px;
+letter-spacing:0.8px;
+padding:6px 14px;
+background:none;
+border:1px solid var(–border2);
+border-radius:6px;
+color:var(–muted2);
+cursor:pointer;
+text-transform:uppercase;
+transition:all 0.15s;
+}
+
+.btn-sm:hover { color:var(–green); border-color:rgba(0,229,160,0.35); }
+
+/* ── RESULT ── */
+.result-block {
+background:var(–s1);
+border:1px solid var(–border);
+border-radius:12px;
+overflow:hidden;
+margin-bottom:14px;
+}
+
+.result-bar {
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:12px 20px;
+background:var(–s2);
+border-bottom:1px solid var(–border);
+}
+
+.result-label {
+font-family:‘DM Mono’, monospace;
+font-size:9px;
+letter-spacing:2px;
+text-transform:uppercase;
+color:var(–green);
+}
+
+.result-body {
+padding:22px;
+font-size:13.5px;
+line-height:1.8;
+color:var(–muted2);
+white-space:pre-wrap;
+min-height:80px;
+font-style:italic;
+}
+
+.result-body.streaming::after {
+content:‘▋’;
+color:var(–green);
+animation:blink 0.7s infinite;
+font-style:normal;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.result-footer {
+padding:10px 20px;
+border-top:1px solid var(–border);
+background:var(–s2);
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.footer-note {
+font-family:‘DM Mono’, monospace;
+font-size:9px;
+letter-spacing:1px;
+color:var(–muted);
+display:flex;
+align-items:center;
+gap:6px;
+}
+
+/* ── RATE CARDS ── */
+.rate-row {
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:1px;
+background:var(–border);
+border-bottom:1px solid var(–border);
+}
+
+.rate-cell {
+background:var(–s1);
+padding:22px 16px;
+text-align:center;
+}
+
+.rc-label {
+font-family:‘DM Mono’, monospace;
+font-size:9px;
+letter-spacing:1.5px;
+text-transform:uppercase;
+color:var(–muted);
+margin-bottom:8px;
+}
+
+.rc-val {
+font-size:32px;
+font-weight:600;
+line-height:1;
+}
+
+.rc-sub {
+font-family:‘DM Mono’, monospace;
+font-size:9px;
+color:var(–muted);
+margin-top:5px;
+letter-spacing:0.5px;
+}
+
+.rate-cell.low  .rc-val { color:#ff8040; }
+.rate-cell.mid  .rc-val { color:var(–green); }
+.rate-cell.high .rc-val { color:#6688ff; }
+
+/* ── MARGIN BAR ── */
+.margin-wrap {
+display:flex;
+align-items:center;
+gap:16px;
+padding:14px 22px;
+background:var(–s2);
+border-bottom:1px solid var(–border);
+}
+
+.margin-label {
+font-family:‘DM Mono’, monospace;
+font-size:9px;
+letter-spacing:1.5px;
+text-transform:uppercase;
+color:var(–muted);
+flex-shrink:0;
+}
+
+.margin-track {
+flex:1;
+height:3px;
+background:var(–border);
+border-radius:2px;
+overflow:hidden;
+}
+
+.margin-fill {
+height:100%;
+background:linear-gradient(90deg, var(–green), #00ddff);
+border-radius:2px;
+transition:width 1.2s cubic-bezier(0.16,1,0.3,1);
+}
+
+.margin-val {
+font-size:20px;
+font-weight:600;
+color:var(–green);
+flex-shrink:0;
+}
+
+/* ── EMAIL ── */
+.email-wrap {
+background:var(–s1);
+border:1px solid var(–border);
+border-radius:12px;
+overflow:hidden;
+margin-bottom:14px;
+}
+
+.email-chrome {
+display:flex;
+align-items:center;
+gap:10px;
+padding:12px 16px;
+background:var(–s2);
+border-bottom:1px solid var(–border);
+}
+
+.chrome-dots { display:flex; gap:6px; }
+.cdot { width:10px; height:10px; border-radius:50%; }
+
+.email-subj {
+flex:1;
+background:var(–bg);
+border:1px solid var(–border);
+border-radius:4px;
+padding:4px 10px;
+font-family:‘DM Mono’, monospace;
+font-size:11px;
+color:var(–muted2);
+letter-spacing:0.3px;
+}
+
+.email-body {
+padding:22px;
+font-size:13.5px;
+line-height:1.8;
+color:var(–muted2);
+white-space:pre-wrap;
+font-style:italic;
+min-height:80px;
+}
+
+/* ── SMS ── */
+.sms-wrap {
+background:var(–s1);
+border:1px solid var(–border);
+border-radius:12px;
+overflow:hidden;
+margin-bottom:14px;
+}
+
+.sms-bar {
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:10px 16px;
+background:var(–s2);
+border-bottom:1px solid var(–border);
+}
+
+.sms-label {
+font-family:‘DM Mono’, monospace;
+font-size:9px;
+letter-spacing:1.5px;
+text-transform:uppercase;
+color:var(–muted);
+}
+
+.sms-body {
+padding:16px 22px;
+font-size:13px;
+color:var(–muted2);
+line-height:1.7;
+font-style:italic;
+}
+
+/* ── CHAT ── */
+.chat-messages {
+max-height:420px;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+gap:1px;
+background:var(–border);
+border:1px solid var(–border);
+border-radius:12px;
+overflow:hidden;
+margin-bottom:14px;
+scrollbar-width:thin;
+scrollbar-color:var(–border) transparent;
+}
+
+.msg-row {
+display:flex;
+background:var(–s1);
+animation:rise 0.2s ease;
+}
+
+.msg-who {
+width:80px;
+flex-shrink:0;
+padding:16px 14px;
+font-family:‘DM Mono’, monospace;
+font-size:9px;
+letter-spacing:1.5px;
+text-transform:uppercase;
+color:var(–muted);
+border-right:1px solid var(–border);
+background:var(–s2);
+display:flex;
+align-items:flex-start;
+padding-top:18px;
+}
+
+.msg-row.user .msg-who { color:var(–green); background:var(–s3); }
+
+.msg-text {
+flex:1;
+padding:16px 20px;
+font-size:13.5px;
+line-height:1.75;
+color:var(–muted2);
+font-style:italic;
+}
+
+.msg-row.user .msg-text { color:var(–text); font-style:normal; }
+
+.chat-input-row {
+display:flex;
+gap:8px;
+margin-bottom:14px;
+}
+
+.chat-input-row input { flex:1; }
+
+.chat-send {
+padding:10px 20px;
+background:var(–green);
+color:#000;
+border:none;
+border-radius:8px;
+font-family:‘Playfair Display’, serif;
+font-size:14px;
+font-weight:600;
+cursor:pointer;
+flex-shrink:0;
+transition:all 0.18s;
+}
+
+.chat-send:hover { background:#18ffb8; }
+
+.quick-row {
+display:flex;
+flex-wrap:wrap;
+gap:6px;
+margin-bottom:14px;
+}
+
+.qp {
+font-family:‘Playfair Display’, serif;
+font-size:12px;
+font-style:italic;
+padding:6px 14px;
+background:var(–s1);
+border:1px solid var(–border);
+border-radius:20px;
+color:var(–muted2);
+cursor:pointer;
+transition:all 0.15s;
+}
+
+.qp:hover { border-color:rgba(0,229,160,0.35); color:var(–green); }
+
+/* ── HISTORY ── */
+.history-table {
+border:1px solid var(–border);
+border-radius:12px;
+overflow:hidden;
+}
+
+.history-row {
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:16px 20px;
+border-bottom:1px solid var(–border);
+background:var(–s1);
+transition:background 0.15s;
+cursor:pointer;
+}
+
+.history-row:last-child { border-bottom:none; }
+.history-row:hover { background:var(–s2); }
+
+.hl-lane { font-size:14px; font-weight:600; }
+.hl-meta { font-family:‘DM Mono’, monospace; font-size:10px; color:var(–muted); margin-top:3px; letter-spacing:0.3px; }
+.hl-rate { font-size:24px; font-weight:600; color:var(–green); }
+
+.empty-hist {
+text-align:center;
+padding:48px;
+color:var(–muted);
+font-size:14px;
+font-style:italic;
+background:var(–s1);
+border:1px solid var(–border);
+border-radius:12px;
+}
+
+@media(max-width:600px){
+.grid-2,.grid-3{ grid-template-columns:1fr; }
+.rate-row{ grid-template-columns:1fr; }
+.hero h1{ font-size:32px; }
+.tabs{ overflow-x:auto; }
+.tab{ font-size:12px; padding:9px 8px; }
+.msg-who{ width:52px; }
+}
+</style>
+
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+
+  <header class="header">
+    <div class="logo">Novi<em>rel</em></div>
+    <div class="badge"><div class="live-dot"></div> AI Online</div>
+  </header>
+
+  <!-- HERO -->
+
+  <div class="hero">
+    <h1>Freight brokering,<br><em>assisted by AI.</em></h1>
+    <p class="hero-sub" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted2);max-width:440px;line-height:1.7;letter-spacing:0.3px;margin-bottom:0">Rate intelligence, carrier outreach &amp; load tracking — built for brokers who move fast.</p>
+    <div class="hero-stats">
+      <div><div class="hstat-val">4</div><div class="hstat-lbl">Tools</div></div>
+      <div><div class="hstat-val">~10s</div><div class="hstat-lbl">Per task</div></div>
+      <div><div class="hstat-val">$0</div><div class="hstat-lbl">To start</div></div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('quote',this)">Rate Quote</button>
+    <button class="tab" onclick="switchTab('email',this)">Carrier Email</button>
+    <button class="tab" onclick="switchTab('track',this)">Check Call</button>
+    <button class="tab" onclick="switchTab('chat',this)">Ask AI</button>
+    <button class="tab" onclick="switchTab('history',this)">History</button>
+  </div>
+
+  <!-- RATE QUOTE -->
+
+  <div id="tab-quote" class="panel active">
+    <div class="section-label">Rate Intelligence</div>
+    <div class="section-desc">Enter load details to receive a market rate range, lane analysis, and margin strategy.</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-icon">—</div> Load Details</div>
+        <span class="tag tag-green">Market Rates</span>
+      </div>
+      <div class="grid grid-2">
+        <div class="field"><label>Origin</label><input id="q-origin" placeholder="Chicago, IL"></div>
+        <div class="field"><label>Destination</label><input id="q-dest" placeholder="Atlanta, GA"></div>
+        <div class="field"><label>Equipment</label>
+          <select id="q-equip">
+            <option>Dry Van (53')</option><option>Reefer</option><option>Flatbed</option>
+            <option>Step Deck</option><option>Power Only</option><option>Box Truck</option><option>Hotshot</option>
+          </select>
+        </div>
+        <div class="field"><label>Weight (lbs)</label><input id="q-weight" placeholder="42,000"></div>
+        <div class="field"><label>Pickup Date</label><input id="q-date" type="date"></div>
+        <div class="field"><label>Commodity</label><input id="q-commodity" placeholder="General Freight"></div>
+        <div class="field"><label>Miles (approx)</label><input id="q-miles" placeholder="850"></div>
+        <div class="field"><label>Target Margin ($)</label><input id="q-margin" placeholder="300"></div>
+        <div class="field full"><label>Special Requirements</label><input id="q-special" placeholder="Team drivers, hazmat, liftgate, no touch..."></div>
+      </div>
+      <button class="btn-run" id="quote-btn" onclick="generateQuote()">Generate Analysis</button>
+    </div>
+
+```
+<div id="quote-result" style="display:none">
+  <div class="result-block">
+    <div id="rate-cards-area"></div>
+    <div id="margin-area"></div>
+    <div class="result-bar">
+      <span class="result-label">Lane Analysis</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn-sm" onclick="saveToHistory()">Save</button>
+        <button class="btn-sm" onclick="copyEl('quote-out')">Copy</button>
+      </div>
+    </div>
+    <div class="result-body" id="quote-out"></div>
+    <div class="result-footer">
+      <span class="footer-note"><span class="live-dot"></span> Novirel AI</span>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- CARRIER EMAIL -->
+
+  <div id="tab-email" class="panel">
+    <div class="section-label">Carrier Outreach</div>
+    <div class="section-desc">Generate a ready-to-send carrier email and SMS version from your load details.</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-icon">—</div> Load Details</div>
+        <span class="tag tag-green">Auto-Draft</span>
+      </div>
+      <div class="grid grid-2">
+        <div class="field"><label>Origin</label><input id="e-origin" placeholder="Dallas, TX"></div>
+        <div class="field"><label>Destination</label><input id="e-dest" placeholder="Phoenix, AZ"></div>
+        <div class="field"><label>Equipment</label>
+          <select id="e-equip">
+            <option>Dry Van (53')</option><option>Reefer</option><option>Flatbed</option>
+            <option>Step Deck</option><option>Power Only</option>
+          </select>
+        </div>
+        <div class="field"><label>Rate Offering ($)</label><input id="e-rate" placeholder="2,400"></div>
+        <div class="field"><label>Pickup Date</label><input id="e-date" type="date"></div>
+        <div class="field"><label>Pickup Window</label><input id="e-time" placeholder="08:00 – 12:00"></div>
+        <div class="field"><label>Commodity</label><input id="e-commodity" placeholder="General Freight"></div>
+        <div class="field"><label>Miles (approx)</label><input id="e-miles" placeholder="620"></div>
+        <div class="field full"><label>Notes</label><input id="e-notes" placeholder="Drop & hook, no touch, hazmat cert required..."></div>
+      </div>
+      <button class="btn-run" id="email-btn" onclick="generateEmail()">Write Email</button>
+    </div>
+
+```
+<div id="email-result" style="display:none">
+  <div class="email-wrap">
+    <div class="email-chrome">
+      <div class="chrome-dots">
+        <div class="cdot" style="background:#ff5f57"></div>
+        <div class="cdot" style="background:#febc2e"></div>
+        <div class="cdot" style="background:#28c840"></div>
+      </div>
+      <div class="email-subj" id="email-subj">Subject —</div>
+      <button class="btn-sm" onclick="copyEl('email-body')">Copy</button>
+    </div>
+    <div class="email-body" id="email-body"></div>
+  </div>
+  <div class="sms-wrap" id="sms-wrap" style="display:none">
+    <div class="sms-bar">
+      <span class="sms-label">SMS Version</span>
+      <button class="btn-sm" onclick="copyEl('sms-body')">Copy</button>
+    </div>
+    <div class="sms-body" id="sms-body"></div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- CHECK CALL -->
+
+  <div id="tab-track" class="panel">
+    <div class="section-label">Check Call Generator</div>
+    <div class="section-desc">Generate a professional shipper update — phone script, email, and SMS — in seconds.</div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-icon">—</div> Load Status</div>
+        <span class="tag tag-amber">Live Update</span>
+      </div>
+      <div class="grid grid-2">
+        <div class="field"><label>Carrier / Driver</label><input id="t-driver" placeholder="Mike's Transport LLC"></div>
+        <div class="field"><label>Load Number</label><input id="t-load" placeholder="NVR-10042"></div>
+        <div class="field"><label>Current Location</label><input id="t-location" placeholder="Memphis, TN"></div>
+        <div class="field"><label>Delivering To</label><input id="t-dest" placeholder="Nashville, TN — ABC Warehouse"></div>
+        <div class="field"><label>Scheduled Delivery</label><input id="t-delivery" placeholder="Today by 3:00 PM"></div>
+        <div class="field"><label>Status</label>
+          <select id="t-status">
+            <option>On time</option><option>Running late</option><option>Delivered</option>
+            <option>Breakdown / Issue</option><option>Waiting at shipper</option><option>Loaded and rolling</option>
+          </select>
+        </div>
+        <div class="field full"><label>Additional Details</label><input id="t-notes" placeholder="Running 45 min behind due to I-40 traffic..."></div>
+      </div>
+      <button class="btn-run" id="track-btn" onclick="generateCheckCall()">Generate Update</button>
+    </div>
+
+```
+<div id="track-result" style="display:none">
+  <div class="result-block">
+    <div class="result-bar">
+      <span class="result-label">Update Script</span>
+      <button class="btn-sm" onclick="copyEl('track-out')">Copy</button>
+    </div>
+    <div class="result-body" id="track-out"></div>
+    <div class="result-footer">
+      <span class="footer-note"><span class="live-dot"></span> Novirel AI</span>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- CHAT -->
+
+  <div id="tab-chat" class="panel">
+    <div class="section-label">Ask AI</div>
+    <div class="section-desc">Your freight broker mentor. Ask anything about rates, negotiations, carriers, or growing your business.</div>
+    <div class="quick-row">
+      <button class="qp" onclick="fillChat('How do I negotiate when a carrier is asking too much?')">Carrier negotiation</button>
+      <button class="qp" onclick="fillChat('What are red flags when vetting a new carrier?')">Carrier vetting</button>
+      <button class="qp" onclick="fillChat('How do I find direct shippers without a load board?')">Direct shippers</button>
+      <button class="qp" onclick="fillChat('What margins should I target as a new broker?')">Margin targets</button>
+      <button class="qp" onclick="fillChat('How do I handle a shipper threatening to cancel?')">Angry shippers</button>
+      <button class="qp" onclick="fillChat('What is double brokering and how do I avoid it?')">Double brokering</button>
+    </div>
+    <div class="chat-messages" id="chat-messages" style="max-height:420px;overflow-y:auto">
+      <div class="msg-row ai">
+        <div class="msg-who">Novirel</div>
+        <div class="msg-text">Hello. I'm your Novirel AI — a freight broker mentor built into your workflow. Ask me anything about rates, negotiations, carrier problems, finding shippers, or growing your brokerage.</div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input id="chat-input" placeholder="Ask anything about freight brokering…" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">Send</button>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+
+  <div id="tab-history" class="panel">
+    <div class="section-label">Saved Quotes</div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="btn-sm" onclick="clearHistory()">Clear All</button>
+    </div>
+    <div id="history-list"></div>
+  </div>
+
+</div>
+
+<script>
+const SYS = `You are Novirel AI — a sharp, experienced freight broker mentor. Help brokers with rate analysis, carrier outreach, negotiation, shipper communication, carrier vetting, and business growth. Be direct, practical, and use real industry language (DAT, Truckstop, rate con, BOL, FMCSA, MC number). Keep responses concise and actionable. When giving rates always include a range.`;
+
+let chatHistory = [];
+let savedQuotes = JSON.parse(localStorage.getItem('nv_quotes') || '[]');
+
+function switchTab(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  if (name === 'history') renderHistory();
+}
+
+async function callClaude(messages, sys) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': 'sk-ant-api03-ENOv-QMn4VBVfdxpPJEYf5vAU_FMtw_y37SKYgcTu67yJOyTvv1YQ4bGk3D_iNCAv3OTL7DSo5Lh5DYOJekhwQ-7mhZ_QAA',
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: sys || SYS, messages })
+  });
+  const d = await res.json();
+  return d.content?.[0]?.text || 'Could not get a response. Please try again.';
+}
+
+async function typeInto(elId, text) {
+  const el = document.getElementById(elId);
+  el.textContent = '';
+  el.classList.add('streaming');
+  let i = 0;
+  return new Promise(res => {
+    const iv = setInterval(() => {
+      i = Math.min(i + 5, text.length);
+      el.textContent = text.substring(0, i);
+      if (i >= text.length) { el.classList.remove('streaming'); clearInterval(iv); res(text); }
+    }, 10);
+  });
+}
+
+async function generateQuote() {
+  const o = g('q-origin'), d = g('q-dest');
+  if (!o || !d) { alert('Please enter origin and destination.'); return; }
+  setBtn('quote-btn', true, 'Analyzing…');
+  show('quote-result');
+  document.getElementById('rate-cards-area').innerHTML = '';
+  document.getElementById('margin-area').innerHTML = '';
+
+  const prompt = `Freight rate analysis:
+Origin: ${o} | Destination: ${d} | Equipment: ${g('q-equip')} | Weight: ${g('q-weight')||'unspecified'} | Miles: ${g('q-miles')||'estimate'} | Pickup: ${g('q-date')||'flexible'} | Commodity: ${g('q-commodity')||'general freight'} | Special: ${g('q-special')||'none'} | Target margin: ${g('q-margin') ? '$'+g('q-margin') : 'unspecified'}
+
+Line 1 must be exactly: LOW: $X,XXX | MARKET: $X,XXX | HIGH: $X,XXX
+
+Then provide:
+LANE ANALYSIS — 2-3 sentences on this corridor
+RATE FACTORS — key factors affecting this rate
+MARGIN STRATEGY — what to charge the shipper vs pay the carrier
+NEGOTIATION LINE — one sentence to use when a carrier pushes back`;
+
+  const text = await callClaude([{ role: 'user', content: prompt }]).catch(() => 'Connection error. Please add your API key.');
+
+  const m = text.match(/LOW[:\s]+\$?([\d,]+).*?MARKET[:\s]+\$?([\d,]+).*?HIGH[:\s]+\$?([\d,]+)/i);
+  if (m) {
+    document.getElementById('rate-cards-area').innerHTML = `
+      <div class="rate-row">
+        <div class="rate-cell low"><div class="rc-label">Low Ball</div><div class="rc-val">$${m[1]}</div><div class="rc-sub">Carrier unlikely</div></div>
+        <div class="rate-cell mid"><div class="rc-label">Market Rate</div><div class="rc-val">$${m[2]}</div><div class="rc-sub">Best to cover</div></div>
+        <div class="rate-cell high"><div class="rc-label">High End</div><div class="rc-val">$${m[3]}</div><div class="rc-sub">Tight capacity</div></div>
+      </div>`;
+    const margin = parseInt(g('q-margin'));
+    const market = parseInt(m[2].replace(',', ''));
+    if (margin && market) {
+      const pct = Math.min(Math.round((margin / market) * 100), 100);
+      document.getElementById('margin-area').innerHTML = `
+        <div class="margin-wrap">
+          <span class="margin-label">Margin</span>
+          <div class="margin-track"><div class="margin-fill" id="mfill" style="width:0%"></div></div>
+          <span class="margin-val">$${margin} · ${pct}%</span>
+        </div>`;
+      setTimeout(() => { const f = document.getElementById('mfill'); if (f) f.style.width = pct + '%'; }, 80);
+    }
+  }
+
+  await typeInto('quote-out', text.replace(/^LOW.*HIGH.*\$[\d,]+[^\n]*\n?/i, '').trim());
+  setBtn('quote-btn', false, 'Generate Analysis');
+}
+
+async function generateEmail() {
+  const o = g('e-origin'), d = g('e-dest');
+  if (!o || !d) { alert('Please enter origin and destination.'); return; }
+  setBtn('email-btn', true, 'Writing…');
+  show('email-result');
+  document.getElementById('email-body').textContent = '';
+  document.getElementById('sms-wrap').style.display = 'none';
+
+  const prompt = `Write a professional carrier outreach email:
+Origin: ${o} | Destination: ${d} | Equipment: ${g('e-equip')} | Rate: ${g('e-rate') ? '$'+g('e-rate') : 'call to discuss'} | Pickup: ${g('e-date')||'TBD'} ${g('e-time') ? '('+g('e-time')+')' : ''} | Commodity: ${g('e-commodity')||'general freight'} | Miles: ${g('e-miles')||''} | Notes: ${g('e-notes')||'none'}
+
+FORMAT exactly:
+SUBJECT: [subject]
+---EMAIL---
+[body — professional, direct, max 120 words, sign as Novirel Logistics]
+---SMS---
+[under 160 chars]`;
+
+  const text = await callClaude([{ role: 'user', content: prompt }]).catch(() => 'Connection error.');
+  const subj = text.match(/SUBJECT:\s*(.+)/i);
+  const emailM = text.match(/---EMAIL---([\s\S]*?)---SMS---/i);
+  const smsM = text.match(/---SMS---([\s\S]*)/i);
+
+  document.getElementById('email-subj').textContent = subj ? 'Subject: ' + subj[1].trim() : 'Subject —';
+  await typeInto('email-body', emailM ? emailM[1].trim() : text);
+
+  if (smsM) {
+    document.getElementById('sms-body').textContent = smsM[1].trim();
+    document.getElementById('sms-wrap').style.display = 'block';
+  }
+  setBtn('email-btn', false, 'Write Email');
+}
+
+async function generateCheckCall() {
+  const loc = g('t-location'), dest = g('t-dest');
+  if (!loc || !dest) { alert('Please enter location and destination.'); return; }
+  setBtn('track-btn', true, 'Generating…');
+  show('track-result');
+
+  const prompt = `Freight broker check call update:
+Carrier: ${g('t-driver')||'carrier'} | Load: ${g('t-load')||'N/A'} | Location: ${loc} | Delivering: ${dest} | Scheduled: ${g('t-delivery')||'as scheduled'} | Status: ${g('t-status')} | Notes: ${g('t-notes')||'none'}
+
+Provide three labeled sections: PHONE SCRIPT / EMAIL UPDATE / SMS (under 160 chars)`;
+
+  await callClaude([{ role: 'user', content: prompt }]).then(t => typeInto('track-out', t)).catch(() => typeInto('track-out', 'Connection error.'));
+  setBtn('track-btn', false, 'Generate Update');
+}
+
+async function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+
+  const c = document.getElementById('chat-messages');
+  c.innerHTML += `<div class="msg-row user"><div class="msg-who">You</div><div class="msg-text">${msg}</div></div>`;
+  chatHistory.push({ role: 'user', content: msg });
+
+  const tid = 'ai-' + Date.now();
+  c.innerHTML += `<div class="msg-row ai" id="${tid}"><div class="msg-who">Novirel</div><div class="msg-text streaming" id="t-${tid}"></div></div>`;
+  c.scrollTop = c.scrollHeight;
+
+  const reply = await callClaude(chatHistory).catch(() => 'Connection error.');
+  chatHistory.push({ role: 'assistant', content: reply });
+
+  const el = document.getElementById('t-' + tid);
+  if (el) { el.classList.remove('streaming'); el.textContent = reply; }
+  c.scrollTop = c.scrollHeight;
+}
+
+function fillChat(text) {
+  document.getElementById('chat-input').value = text;
+  document.getElementById('chat-input').focus();
+}
+
+function saveToHistory() {
+  const o = g('q-origin'), d = g('q-dest');
+  const text = document.getElementById('quote-out').textContent;
+  const m = text.match(/MARKET[:\s]+\$?([\d,]+)/i);
+  if (!o || !d) return;
+  savedQuotes.unshift({ id: Date.now(), lane: `${o} → ${d}`, equip: g('q-equip'), rate: m ? '$' + m[1] : '—', date: new Date().toLocaleDateString() });
+  localStorage.setItem('nv_quotes', JSON.stringify(savedQuotes.slice(0, 50)));
+  alert('Quote saved.');
+}
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (!savedQuotes.length) {
+    el.innerHTML = `<div class="empty-hist">No saved quotes yet. Generate a rate quote and click Save.</div>`;
+    return;
+  }
+  el.innerHTML = `<div class="history-table">` +
+    savedQuotes.map(q => `
+      <div class="history-row">
+        <div><div class="hl-lane">${q.lane}</div><div class="hl-meta">${q.equip} &middot; ${q.date}</div></div>
+        <div class="hl-rate">${q.rate}</div>
+      </div>`).join('') + `</div>`;
+}
+
+function clearHistory() {
+  if (confirm('Clear all saved quotes?')) { savedQuotes = []; localStorage.removeItem('nv_quotes'); renderHistory(); }
+}
+
+function g(id) { return document.getElementById(id)?.value?.trim() || ''; }
+function show(id) { document.getElementById(id).style.display = 'block'; }
+function setBtn(id, dis, txt) { const b = document.getElementById(id); b.disabled = dis; b.textContent = txt; }
+function copyEl(id) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
+    const b = event.target, orig = b.textContent;
+    b.textContent = 'Copied'; setTimeout(() => b.textContent = orig, 1500);
+  });
+}
+
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('q-date').value = today;
+document.getElementById('e-date').value = today;
+</script>
+
+</body>
+</html>
