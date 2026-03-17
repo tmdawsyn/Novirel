@@ -50,7 +50,7 @@ opacity:.5;}
 .pages{flex:1;position:relative;overflow:hidden;}
 .page{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;
 padding-top:calc(var(–safe-t) + 8px);
-padding-bottom:calc(var(–nav-h) + var(–safe-b) + 12px);
+padding-bottom:calc(var(–nav-h) + var(–safe-b) + 28px);
 opacity:0;pointer-events:none;transform:translateY(10px);
 transition:opacity .3s ease, transform .3s ease;}
 .page::-webkit-scrollbar{display:none;}
@@ -67,9 +67,9 @@ padding-bottom:0;
 /* ── BOTTOM NAV ── */
 .bottom-nav{
 position:fixed;bottom:0;left:0;right:0;
-height:calc(var(–nav-h) + var(–safe-b));
-padding-bottom:var(–safe-b);
-background:rgba(7,7,7,.92);
+height:calc(var(–nav-h) + var(–safe-b) + 16px);
+padding-bottom:calc(var(–safe-b) + 8px);
+background:rgba(7,7,7,.96);
 backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
 border-top:1px solid var(–b1);
 display:flex;align-items:stretch;
@@ -84,7 +84,7 @@ transition:color .2s;padding:0;}
 .nav-label{font-family:‘DM Mono’,monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;}
 
 /* ── SHARED COMPONENTS ── */
-.page-header{padding:16px 20px 8px;display:flex;justify-content:space-between;align-items:center;}
+.page-header{padding:calc(var(–safe-t) + 52px) 20px 8px;display:flex;justify-content:space-between;align-items:center;}
 .page-title{font-weight:800;font-size:26px;letter-spacing:-1px;}
 .mono{font-family:‘DM Mono’,monospace;}
 .eyebrow{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:2px;color:var(–fg3);text-transform:uppercase;margin-bottom:8px;}
@@ -149,7 +149,7 @@ padding:14px 16px;outline:none;transition:border-color .2s;
 PAGE 1 — DASHBOARD
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 #page-dashboard .dash-header{
-padding:calc(var(–safe-t) + 16px) 20px 12px;
+padding:calc(var(–safe-t) + 52px) 20px 12px;
 display:flex;justify-content:space-between;align-items:center;}
 .brand-logo{font-weight:800;font-size:24px;letter-spacing:-1px;}
 .brand-logo em{font-style:normal;color:var(–fg3);}
@@ -175,6 +175,7 @@ padding:36px 24px;text-align:center;}
 .dash-empty-card .e-icon{font-size:36px;margin-bottom:12px;opacity:.5;}
 .dash-empty-card .e-title{font-weight:700;font-size:17px;letter-spacing:-.3px;margin-bottom:6px;}
 .dash-empty-card .e-sub{font-size:12px;color:var(–fg2);line-height:1.6;margin-bottom:18px;}
+.dash-empty-card button{background:var(–fg);color:var(–bg);border:none;}
 
 .active-loads-section{padding:0 20px;}
 .load-item{background:var(–s1);border:1px solid var(–b1);border-radius:16px;
