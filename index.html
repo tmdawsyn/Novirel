@@ -29,8 +29,8 @@
   --amber: #d4a843;
   --red: #d47070;
   --blue: #7ab0d4;
-  --safe-t: env(safe-area-inset-top, 0px);
-  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: 50px;
+  --safe-b: 34px;
   --nav-h: 64px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Syne',sans-serif;}
@@ -1062,12 +1062,10 @@ renderContracts();
 renderCarriers();
 if (state.profile.name) document.getElementById('profile-display-name').textContent = state.profile.name;
 
-// ── SERVICE WORKER ──
+// ── UNREGISTER OLD SERVICE WORKERS ──
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(() => console.log('NovAI SW registered'))
-      .catch(e => console.log('SW error:', e));
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    registrations.forEach(r => r.unregister());
   });
 }
 </script>
