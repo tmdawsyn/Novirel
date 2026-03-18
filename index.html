@@ -8,11 +8,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Novirel">
-<meta name="theme-color" content="#070707">
+<meta name="theme-color" content="#000000">
 <meta name="description" content="Novirel — Your cross-border freight brokerage assistant">
-<link rel="manifest" href="manifest.json?v=5">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=5">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=5">
+<link rel="manifest" href="/manifest.json?v=200">
+<link rel="icon" type="image/png" href="/apple-touch-icon.png?v=200">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=200">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=200">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -109,11 +110,14 @@ flex:1;
 display:flex;flex-direction:column;
 align-items:center;justify-content:center;
 gap:4px;border:none;background:transparent;
-color:var(–fg3);cursor:pointer;
+color:rgba(255,255,255,0.4);cursor:pointer;
 transition:color .2s;padding:0 0 4px;}
-.nav-btn.active{color:var(–fg);}
+.nav-btn.active{color:#ffffff;}
 .nav-btn:active{opacity:.7;}
 .nav-icon{font-size:20px;line-height:1;transition:transform .2s;display:flex;align-items:center;justify-content:center;}
+.nav-icon svg{stroke:#ffffff;stroke-width:2;}
+.nav-btn.active .nav-icon svg{stroke:#ffffff;stroke-width:2;}
+.nav-btn:not(.active) .nav-icon svg{stroke:rgba(255,255,255,0.4);stroke-width:2;}
 .nav-btn.active .nav-icon{transform:scale(1.1);}
 .nav-label{font-family:‘DM Mono’,monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;}
 
